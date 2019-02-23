@@ -1,13 +1,20 @@
 'use strict';
 
-const MAX_TASK_NUMBER = 10;
+const MAX_TASK_COUNT = 10;
+const MIN_TASK_COUNT = 1;
 const TASK_NUMBER = 7;
 
 const boardTask = document.querySelector(`.board__tasks`);
 const filterSection = document.querySelector(`.main__filter`);
 
 // функция отрисовки фильтра
-
+/**
+ *
+ * @param {string} title
+ * @param {number} amount
+ * @param {boolean} isChecked
+ * @return {string}
+ */
 const getElementFilter = function (title, amount, isChecked = false) {
   return `
     <input
@@ -25,21 +32,29 @@ const getElementFilter = function (title, amount, isChecked = false) {
 };
 
 // функция отрисовки карточки задания
-
+/**
+ * @param {Node} template
+ * @return {Node}
+ */
 const generateTask = function (template) {
   return document.importNode(template.content, true);
 };
 
 // функция создания борда карточек
-
-const generateTaskList = function (count) {
+/**
+ * @param {Node} board
+ * @param {Number} count
+ */
+const generateTaskList = function (board, count) {
   const template = document.querySelector(`#task-template`);
-  const fragment = document.createDocumentFragment();
-  for (let i = 0; i < count; i++) {
-    let task = generateTask(template);
-    fragment.appendChild(task);
-  }
-  boardTask.appendChild(fragment);
+  const baseFragment = document.createDocumentFragment();
+  let tasks = new Array(count)
+    .fill(template)
+    .map(generateTask)
+    .forEach((item) => {
+      baseFragment.appendChild(item);
+    });
+  board.appendChild(baseFragment);
 };
 
 filterSection.insertAdjacentHTML(`beforeend`, getElementFilter(`All`, 15, true));
@@ -50,11 +65,11 @@ filterSection.insertAdjacentHTML(`beforeend`, getElementFilter(`Repeating`, 2));
 filterSection.insertAdjacentHTML(`beforeend`, getElementFilter(`Tags`, 6));
 filterSection.insertAdjacentHTML(`beforeend`, getElementFilter(`Archive`, 115));
 
-generateTaskList(TASK_NUMBER);
+generateTaskList(boardTask, TASK_NUMBER);
 
 filterSection.addEventListener(`click`, function (evt) {
   evt.preventDefault();
   boardTask.innerHTML = ``;
-  let taskNumber = Math.random() * MAX_TASK_NUMBER;
-  generateTaskList(taskNumber);
+  let randomTaskNumber = Math.floor(Math.random() * (MAX_TASK_COUNT - MIN_TASK_COUNT) + MIN_TASK_COUNT);
+  generateTaskList(boardTask, randomTaskNumber);
 });
